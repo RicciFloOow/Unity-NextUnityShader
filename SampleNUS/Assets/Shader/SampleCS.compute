@@ -1,0 +1,32 @@
+﻿#pragma only_renderers d3d11
+
+#pragma kernel SM66AtomicsSampleKernel
+
+#pragma use_dxc
+
+#pragma multi_compile_local __ NUS_SM_6_6
+
+#include "NUSLib.hlsl"
+
+Texture2D<float4> InputImage;
+
+RWStructuredBuffer<uint64_t> GlobalLumaSum;
+
+[numthreads(8,8,1)]
+void SM66AtomicsSampleKernel (uint3 id : SV_DispatchThreadID)
+{
+#ifdef NUS_SM_6_6
+    float3 color = InputImage.Load(int3(id.xy, 0)).xyz;
+    float luminance = dot(color, float3(0.2126f, 0.7152f, 0.0722f));
+
+    uint64_t lumaFixed64 = (uint64_t)(luminance * 1000.0f);
+
+    uint64_t waveSum = WaveActiveSum(lumaFixed64);
+    
+    if (WaveIsFirstLane())
+    {
+        uint64_t out_Value;
+        NUS_InterlockedAdd(GlobalLumaSum, 0, waveSum, out_Value);
+    }
+#endif
+}
