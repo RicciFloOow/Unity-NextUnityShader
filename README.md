@@ -16,6 +16,7 @@
 
 ### 白名单特性
 
+* **SM 6.2:** 原生16位类型的支持: SM6.2及以上的白名单特性被识别时自动支持，或者使用`Require16bitType()`的空方法来自动识别。
 * **SM 6.4:** [Packed Dot Product Intrinsics](https://github.com/microsoft/DirectXShaderCompiler/wiki/Shader-Model-6.4)
 * **SM 6.6:**
     * 新增的 [Wave-Intrinsics](https://microsoft.github.io/DirectX-Specs/d3d/HLSL_ShaderModel6_5.html#new-wave-intrinsics)

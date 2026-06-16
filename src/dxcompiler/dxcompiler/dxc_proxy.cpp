@@ -396,6 +396,7 @@ static HRESULT STDMETHODCALLTYPE Hooked_Compiler3_Compile(
     if (currentTarget && requiredSM.IsValid())
     {
         SMVersion currentSM = SMVersion::FromTargetProfile(currentTarget);
+        SMVersion finalSM = currentSM;
 
         modifiedArgs.assign(pArguments, pArguments + argCount);
         bool argsModified = false;
@@ -408,6 +409,7 @@ static HRESULT STDMETHODCALLTYPE Hooked_Compiler3_Compile(
             {
                 newTarget = requiredSM.ToTargetProfile(currentTarget);
                 modifiedArgs[targetIndex] = newTarget.c_str();
+                finalSM = requiredSM;
 
                 modifiedArgs.push_back(L"-D");
                 modifiedArgs.push_back(L"UNITY_SM6_SELECT(fallback,...)=(__VA_ARGS__)");
@@ -443,6 +445,7 @@ static HRESULT STDMETHODCALLTYPE Hooked_Compiler3_Compile(
             {
                 newTarget = requiredSM.ToTargetProfile(currentTarget);
                 modifiedArgs[targetIndex] = newTarget.c_str();
+                finalSM = requiredSM;
 
                 char dbg[256];
                 sprintf_s(dbg, "[dxcompiler] Minor SM upgrade: %d.%d -> %d.%d (%ls -> %ls)\n",
@@ -450,6 +453,18 @@ static HRESULT STDMETHODCALLTYPE Hooked_Compiler3_Compile(
                     currentTarget, newTarget.c_str());
                 OutputDebugStringA(dbg);
             }
+        }
+
+        if (finalSM.major == 6 && finalSM.minor >= 2)
+        {
+            modifiedArgs.push_back(L"-enable-16bit-types");
+            modifiedArgs.push_back(L"-HV");
+            modifiedArgs.push_back(L"2021");
+            argsModified = true;
+
+            char dbg[256];
+            sprintf_s(dbg, "[dxcompiler] SM 6.2+ Detected. Injected 16-bit types\n");
+            OutputDebugStringA(dbg);
         }
 
         if (argsModified)

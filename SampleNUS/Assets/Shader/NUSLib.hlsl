@@ -1,6 +1,8 @@
 ﻿#ifndef NUS_LIB_INCLUDED
 #define NUS_LIB_INCLUDED
 
+inline void Require16bitType() {}
+
 #ifdef NUS_SM_6_6
 //ref: https://microsoft.github.io/DirectX-Specs/d3d/HLSL_SM_6_6_Int64_and_Float_Atomics.html
 inline void NUS_Require_SM66_Atomics() {}

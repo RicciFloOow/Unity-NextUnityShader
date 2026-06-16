@@ -263,6 +263,8 @@ void ShaderInspector::BuildBuiltinWhitelist()
         m_whitelist.push_back({ name, SMVersion(major, minor) });
     };
 
+    add(L"Require16bitType", 6, 2);
+
     //ref: https://github.com/microsoft/DirectXShaderCompiler/wiki/Shader-Model-6.4
     add(L"dot4add_u8packed", 6, 4);
     add(L"dot4add_i8packed", 6, 4);
