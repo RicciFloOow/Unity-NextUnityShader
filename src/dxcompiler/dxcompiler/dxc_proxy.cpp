@@ -3,6 +3,8 @@
 
 HMODULE g_hCurrentModule = nullptr;
 
+#define REQUIRE_HLSL2021 1
+
 
 struct IDxcBlob : public IUnknown {
     virtual LPVOID  STDMETHODCALLTYPE GetBufferPointer(void) = 0;
@@ -458,13 +460,19 @@ static HRESULT STDMETHODCALLTYPE Hooked_Compiler3_Compile(
         if (finalSM.major == 6 && finalSM.minor >= 2)
         {
             modifiedArgs.push_back(L"-enable-16bit-types");
+            argsModified = true;
+#if REQUIRE_HLSL2021
             modifiedArgs.push_back(L"-HV");
             modifiedArgs.push_back(L"2021");
-            argsModified = true;
 
+            char dbg[256];
+            sprintf_s(dbg, "[dxcompiler] SM 6.2+ Detected. Injected 16-bit types and HLSL 2021\n");
+            OutputDebugStringA(dbg);
+#else
             char dbg[256];
             sprintf_s(dbg, "[dxcompiler] SM 6.2+ Detected. Injected 16-bit types\n");
             OutputDebugStringA(dbg);
+#endif
         }
 
         if (argsModified)

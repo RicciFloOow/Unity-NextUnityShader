@@ -283,6 +283,9 @@ void ShaderInspector::BuildBuiltinWhitelist()
     //注意, 这里必须用我们自己重新封装的Lib(或者自己封装一下), 防止与SM5.0的冲突了
     add(L"NUS_Require_SM66_Atomics", 6, 6);
 
+    //ref: https://microsoft.github.io/DirectX-Specs/d3d/HLSL_SM_6_6_DynamicResources.html
+    add(L"NUS_Require_SM66_Bindless", 6, 6);
+
     //ref: https://microsoft.github.io/DirectX-Specs/d3d/HLSL_SM_6_6_Pack_Unpack_Intrinsics.html
     add(L"pack4x8",     6, 6);
     add(L"pack4x8un",   6, 6);

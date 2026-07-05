@@ -22,6 +22,7 @@
     * 新增的 [Wave-Intrinsics](https://microsoft.github.io/DirectX-Specs/d3d/HLSL_ShaderModel6_5.html#new-wave-intrinsics)
     * [Int64 与 Float 的原子操作](https://microsoft.github.io/DirectX-Specs/d3d/HLSL_SM_6_6_Int64_and_Float_Atomics.html)
     * [Pack 与 Unpack-Intrinsics](https://microsoft.github.io/DirectX-Specs/d3d/HLSL_SM_6_6_Pack_Unpack_Intrinsics.html)
+    * [Bindless]([HLSL Dynamic Resources | DirectX-Specs](https://microsoft.github.io/DirectX-Specs/d3d/HLSL_SM_6_6_DynamicResources.html))
 * **SM 6.7:** [Quad 特性](https://microsoft.github.io/DirectX-Specs/d3d/HLSL_SM_6_7_QuadAny_QuadAll.html)
 
 > 若需扩展更多特性，请自行在 `shader_inspect.cpp` 的 `BuildBuiltinWhitelist()` 方法中添加。
@@ -33,6 +34,10 @@
 ### SM6.6 原子操作
 
 由于 SM5.0 中 `Int64/Uint64/Float` 的部分原子操作属于重载方法，无法仅凭方法名区分应使用 SM5.0 还是 SM6.6。因此，我们引入了一个特殊的空方法 `NUS_Require_SM66_Atomics()` 作为介入入口。具体实现请参考 `NUSLib.hlsl` 及示例文件 `SampleCS.compute`。
+
+### SM6.6 Bindless
+
+由于`ResourceDescriptorHeap`这种并不是方法形式的，所以为了方便，我还是用`NUS_Require_SM66_Bindless()`这种空方法作为标记需要SM6.6编译的入口。注意，这个dll只是提供了编译，在unity中具体使用Bindless需要额外的插件，可以参考我的另一个示例项目：[RicciFloOow/Unity-BindlessSample](https://github.com/RicciFloOow/Unity-BindlessSample)
 
 ### 在普通光栅化 Shader 中使用 SM6.+ 特性
 
@@ -49,6 +54,10 @@ UNITY_SM6_SELECT
 ```
 
 通过该宏标记后，我们的 Proxy DLL 会在预处理阶段自动识别：在编译低版本目标时采用 fallback 值，编译高版本目标时采用 SM6.+ 代码，从而安全绕过报错逻辑。
+
+### 旧版本unity注意
+
+对于unity 2022.3.+这类"早期"版本，unity所用的dxc还不支持HLSL 2021的特性，因此需要修改`REQUIRE_HLSL2021`为0来编译(unity 6.3所用的dxc版本实测支持了)
 
 
 
