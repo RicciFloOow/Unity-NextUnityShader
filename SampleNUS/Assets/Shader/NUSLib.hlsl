@@ -6,6 +6,8 @@ inline void Require16bitType() {}
 inline void NUS_Require_SM66_Bindless() {}
 
 #ifdef NUS_SM_6_6
+//ref: https://microsoft.github.io/DirectX-Specs/d3d/HLSL_SM_6_6_Derivatives.html
+inline void NUS_Require_SM66_QuadShuffle() {}
 //ref: https://microsoft.github.io/DirectX-Specs/d3d/HLSL_SM_6_6_Int64_and_Float_Atomics.html
 inline void NUS_Require_SM66_Atomics() {}
 

@@ -18,8 +18,9 @@
 
 * **SM 6.2:** 原生16位类型的支持: SM6.2及以上的白名单特性被识别时自动支持，或者使用`Require16bitType()`的空方法来自动识别。
 * **SM 6.4:** [Packed Dot Product Intrinsics](https://github.com/microsoft/DirectXShaderCompiler/wiki/Shader-Model-6.4)
+* **SM 6.5**: 新增的 [Wave-Intrinsics](https://microsoft.github.io/DirectX-Specs/d3d/HLSL_ShaderModel6_5.html#new-wave-intrinsics)
 * **SM 6.6:**
-    * 新增的 [Wave-Intrinsics](https://microsoft.github.io/DirectX-Specs/d3d/HLSL_ShaderModel6_5.html#new-wave-intrinsics)
+    * [CS中Quad*操作的支持](https://microsoft.github.io/DirectX-Specs/d3d/HLSL_SM_6_6_Derivatives.html)
     * [Int64 与 Float 的原子操作](https://microsoft.github.io/DirectX-Specs/d3d/HLSL_SM_6_6_Int64_and_Float_Atomics.html)
     * [Pack 与 Unpack-Intrinsics](https://microsoft.github.io/DirectX-Specs/d3d/HLSL_SM_6_6_Pack_Unpack_Intrinsics.html)
     * [Bindless]([HLSL Dynamic Resources | DirectX-Specs](https://microsoft.github.io/DirectX-Specs/d3d/HLSL_SM_6_6_DynamicResources.html))
@@ -30,6 +31,10 @@
 ---
 
 ## 注意事项
+
+### SM6.6 Quad Shuffle
+
+`QuadReadLaneAt` 等操作在像素着色器中可直接使用( SM6.0 下)。在CS等需要更高目标版本的场景中，请使用 `NUS_Require_SM66_QuadShuffle()` 作为显式标记。
 
 ### SM6.6 原子操作
 
