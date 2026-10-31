@@ -11,10 +11,24 @@ SMVersion SMVersion::FromTargetProfile(const wchar_t* profile)
     while (*p && !(iswdigit(*p) && p > profile && *(p - 1) == L'_'))
         ++p;
     if (!*p) return SMVersion();
-    int mj = *p - L'0'; ++p;
+
+    int mj = 0;
+    while (iswdigit(*p))
+    {
+        mj = mj * 10 + (*p - L'0');
+        ++p;
+    }
+
     if (*p == L'_') ++p;
     if (!iswdigit(*p)) return SMVersion();
-    int mn = *p - L'0';
+
+    int mn = 0;
+    while (iswdigit(*p))
+    {
+        mn = mn * 10 + (*p - L'0');
+        ++p;
+    }
+
     return SMVersion(mj, mn);
 }
 
@@ -302,8 +316,25 @@ void ShaderInspector::BuildBuiltinWhitelist()
     add(L"QuadAny", 6, 7);
     add(L"QuadAll", 6, 7);
 
-    //@TODO: 用上SM6.9的估计得等几年了, 挺馋的
+    //6.3还是1.7的, 但是6.6的是1.10的了, 6.8,6.9和6.10的都支持了
+
+    //ref: https://microsoft.github.io/hlsl-specs/proposals/0015-extended-command-info/
+    //SV_StartVertexLocation与SV_StartInstanceLocation这些
+    add(L"Require_SM68_ExtendedCommandInfo", 6, 8);
+
     //ref: https://github.com/microsoft/hlsl-specs/blob/main/proposals/0026-hlsl-long-vector-type.md
+    add(L"Require_SM69_LongVector", 6, 9);
+
+    //ref: https://github.com/microsoft/hlsl-specs/blob/main/proposals/0035-linalg-matrix.md
+    add(L"Require_SM610_LinalgMatrix", 6, 10);
+
+    //ref: https://github.com/microsoft/hlsl-specs/blob/main/proposals/0048-group-wave-index.md
+    add(L"GetGroupWaveIndex", 6, 10);
+    add(L"GetGroupWaveCount", 6, 10);
+
+    //ref: https://github.com/microsoft/hlsl-specs/blob/main/proposals/0049-variable-groupshared-memory.md
+    add(L"GroupSharedLimit", 6, 10);
+
 }
 
 struct IDxcVersionInfo : public IUnknown {
