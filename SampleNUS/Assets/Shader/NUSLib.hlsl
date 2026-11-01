@@ -5,6 +5,15 @@ inline void Require16bitType() {}
 
 inline void NUS_Require_SM66_Bindless() {}
 
+//ref: https://microsoft.github.io/hlsl-specs/proposals/0015-extended-command-info/
+inline void Require_SM68_ExtendedCommandInfo() {}
+
+//ref: https://github.com/microsoft/hlsl-specs/blob/main/proposals/0026-hlsl-long-vector-type.md
+inline void Require_SM69_LongVector() {}
+
+//ref: https://github.com/microsoft/hlsl-specs/blob/main/proposals/0035-linalg-matrix.md
+inline void Require_SM610_LinalgMatrix() {}
+
 #ifdef NUS_SM_6_6
 //ref: https://microsoft.github.io/DirectX-Specs/d3d/HLSL_SM_6_6_Derivatives.html
 inline void NUS_Require_SM66_QuadShuffle() {}

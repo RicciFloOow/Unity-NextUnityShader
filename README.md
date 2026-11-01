@@ -25,6 +25,12 @@
     * [Pack 与 Unpack-Intrinsics](https://microsoft.github.io/DirectX-Specs/d3d/HLSL_SM_6_6_Pack_Unpack_Intrinsics.html)
     * [Bindless]([HLSL Dynamic Resources | DirectX-Specs](https://microsoft.github.io/DirectX-Specs/d3d/HLSL_SM_6_6_DynamicResources.html))
 * **SM 6.7:** [Quad 特性](https://microsoft.github.io/DirectX-Specs/d3d/HLSL_SM_6_7_QuadAny_QuadAll.html)
+* **SM 6.8:** [Extended Command Info](https://microsoft.github.io/hlsl-specs/proposals/0015-extended-command-info/)（`SV_StartVertexLocation` / `SV_StartInstanceLocation` 等系统语义）
+* **SM 6.9:** [Long Vector 长向量类型](https://github.com/microsoft/hlsl-specs/blob/main/proposals/0026-hlsl-long-vector-type.md)
+* **SM 6.10（preview）:**
+    * [Group Wave Index](https://github.com/microsoft/hlsl-specs/blob/main/proposals/0048-group-wave-index.md)（`GetGroupWaveIndex` / `GetGroupWaveCount`）
+    * [Variable Groupshared Memory](https://github.com/microsoft/hlsl-specs/blob/main/proposals/0049-variable-groupshared-memory.md)（`GroupSharedLimit`）
+    * [LinAlg Matrix](https://github.com/microsoft/hlsl-specs/blob/main/proposals/0035-linalg-matrix.md)
 
 > 若需扩展更多特性，请自行在 `shader_inspect.cpp` 的 `BuildBuiltinWhitelist()` 方法中添加。
 
@@ -44,9 +50,27 @@
 
 由于`ResourceDescriptorHeap`这种并不是方法形式的，所以为了方便，我还是用`NUS_Require_SM66_Bindless()`这种空方法作为标记需要SM6.6编译的入口。注意，这个dll只是提供了编译，在unity中具体使用Bindless需要额外的插件，可以参考我的另一个示例项目：[RicciFloOow/Unity-BindlessSample](https://github.com/RicciFloOow/Unity-BindlessSample)
 
+### SM6.8 Extended Command Info
+
+`SV_StartVertexLocation` 这类是系统语义而不是方法形式，无法自动识别，所以还是用空方法 `Require_SM68_ExtendedCommandInfo()` 作为显式标记。
+
+### SM6.9 Long Vector
+
+同理，长向量是类型而不是方法，使用空方法 `Require_SM69_LongVector()` 作为显式标记。
+
+### SM6.10（preview）特性
+
+`GetGroupWaveIndex` / `GetGroupWaveCount` / `GroupSharedLimit` 是方法形式，可直接识别；LinAlg Matrix 是类型形式，使用空方法 `Require_SM610_LinalgMatrix()` 作为显式标记。上述空方法已在 `NUSLib.hlsl` 中提供，`#include` 引入即可使用。
+
+注意，SM6.10 属于 preview 特性，需要同时满足：
+
+1. **编译侧**：真身 `dxcompiler_orig.dll` 需为 DXC 1.10（unity 6.6 自带的即是，6.3 的为 1.7）。代理会按真身 dxc 版本自动过滤白名单，版本不够的特性不会被误提升；
+2. **运行时侧**：preview Shader Model 必须经运行时放行，需配合 [Unity-EditorPreviewAgilityExt](https://github.com/RicciFloOow/Unity-EditorPreviewAgilityExt) 将编辑器的 Agility SDK 切换到 1.722+（同时要求开启 Windows 开发者模式），否则编译通过也会在 PSO 创建时失败（`E_INVALIDARG`）；
+3. **CS 的 dx11 flavor 问题**：Unity 在分发编译时会自动处理 dx11 flavor——目标为 SM6.+ 的编译不会真正走 FXC，而是将 dx12 编译好的结果作为壳传回 dx11（因为实际不会在 dx11 下运行），这套处理是 Unity 内部行为，代理无法干预。因此 SM6.6 及以下特性均不会报错；但 SM6.7+ 的新特性不在 Unity 这套处理范围内，会真正落到 FXC 编译并报 `undeclared identifier (on dx11)`。该报错只影响 dx11 flavor，不影响 dx12 的实际运行。后续会出 FXC 代理（D3DCompiler_47.dll proxy）来解决；现阶段尝鲜可将项目 Graphics API 移除 DX11，或暂时忍受该报错。
+
 ### 在普通光栅化 Shader 中使用 SM6.+ 特性
 
-在 Compute Shader 中使用白名单特性时，即使目标平台是 DX11，底层也会被提升至 SM6.+ 编译且不显式报错（只需在 C# 端控制好变体即可）。但在普通光栅化 Shader 中，即使强制使用 `#pragma use_dxc`，Unity 在底层仍会强制多跑一遍 DX11（即 SM5.0）的编译流程，遇到 SM6.+ 代码时会直接报错。
+在 Compute Shader 中使用白名单特性时，即使目标平台是 DX11，底层也会被提升至 SM6.+ 编译。Unity 在分发编译时会自动处理 dx11 flavor（SM6.+ 的目标不会真正走 FXC 编译，而是以 dx12 的结果作为壳传回），因此 SM6.6 及以下特性不显式报错；SM6.7+ 的新特性不在此处理范围内，会在 dx11 flavor 下报错（详见「SM6.10（preview）特性」第 3 点），只需在 C# 端控制好变体即可。但在普通光栅化 Shader 中，即使强制使用 `#pragma use_dxc`，Unity 在底层仍会强制多跑一遍 DX11（即 SM5.0）的编译流程，遇到 SM6.+ 代码时会直接报错。
 
 为此，我们提供了一个专用宏 `UNITY_SM6_SELECT` 来规避此问题：
 
