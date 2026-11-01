@@ -1,4 +1,4 @@
-﻿#pragma only_renderers d3d11
+#pragma only_renderers d3d11
 
 #pragma kernel SM66AtomicsSampleKernel
 
@@ -6,7 +6,7 @@
 
 #pragma multi_compile_local __ NUS_SM_6_6
 
-#include "NUSLib.hlsl"
+#include "NUSLib_66.hlsl"
 
 Texture2D<float4> InputImage;
 

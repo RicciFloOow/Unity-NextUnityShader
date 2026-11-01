@@ -12,7 +12,8 @@
 
 1. 进入目标 Unity 编辑器安装目录下的 `Editor\Data\Tools` 文件夹，将自带的 `dxcompiler.dll` 重命名为 `dxcompiler_orig.dll`。
 2. 将本项目提供的 `Release\x64\dxcompiler.dll` 拷贝至上述同级目录中。
-3. 若需使用 SM6.6 的原子操作，请使用 `#include` 引入或参考项目中提供的 `SampleNUS\Assets\Shader\NUSLib.hlsl`。
+3. 若需使用 SM6.6 的原子操作，请使用 `#include` 引入或参考项目中提供的 `SampleNUS\Assets\Shader\NUSLib_66.hlsl`。
+4. NUSLib 按 SM 版本拆分（`NUSLib_62/66/68/69/610.hlsl`），高版本 include 低版本，按需引入即可——白名单对源码做的是子串匹配，include 进来的标记定义也会命中，因此引入的版本决定了编译目标可能被提升到的上限。
 
 ### 白名单特性
 
@@ -44,7 +45,7 @@
 
 ### SM6.6 原子操作
 
-由于 SM5.0 中 `Int64/Uint64/Float` 的部分原子操作属于重载方法，无法仅凭方法名区分应使用 SM5.0 还是 SM6.6。因此，我们引入了一个特殊的空方法 `NUS_Require_SM66_Atomics()` 作为介入入口。具体实现请参考 `NUSLib.hlsl` 及示例文件 `SampleCS.compute`。
+由于 SM5.0 中 `Int64/Uint64/Float` 的部分原子操作属于重载方法，无法仅凭方法名区分应使用 SM5.0 还是 SM6.6。因此，我们引入了一个特殊的空方法 `NUS_Require_SM66_Atomics()` 作为介入入口。具体实现请参考 `NUSLib_66.hlsl` 及示例文件 `SampleCS.compute`。
 
 ### SM6.6 Bindless
 
@@ -60,7 +61,7 @@
 
 ### SM6.10（preview）特性
 
-`GetGroupWaveIndex` / `GetGroupWaveCount` / `GroupSharedLimit` 是方法形式，可直接识别；LinAlg Matrix 是类型形式，使用空方法 `Require_SM610_LinalgMatrix()` 作为显式标记。上述空方法已在 `NUSLib.hlsl` 中提供，`#include` 引入即可使用。
+`GetGroupWaveIndex` / `GetGroupWaveCount` / `GroupSharedLimit` 是方法形式，可直接识别；LinAlg Matrix 是类型形式，使用空方法 `Require_SM610_LinalgMatrix()` 作为显式标记。上述空方法已在 `NUSLib_610.hlsl` 中提供，`#include` 引入即可使用。
 
 注意，SM6.10 属于 preview 特性，需要同时满足：
 

@@ -1,4 +1,4 @@
-﻿Shader "Unlit/SamplePS"
+Shader "Unlit/SamplePS"
 {
     Properties
     {
@@ -20,7 +20,6 @@
             #pragma use_dxc
 
             #include "UnityCG.cginc"
-            #include "NUSLib.hlsl"
 
             struct appdata
             {
